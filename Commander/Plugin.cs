@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ConfigStore;
 using Newtonsoft.Json;
 using Terraria;
@@ -53,14 +55,22 @@ namespace Commander
       }
     }
 
+    private static Command[] _commands;
+
     public override void Initialize()
     {
-      Commands.ChatCommands.AddRange(Config.GetCommands());
+      _commands = Config.GetCommands().ToArray();
+
+      Commands.ChatCommands.AddRange(_commands);
     }
 
     protected override void Dispose(bool disposing)
     {
+      Commands.ChatCommands.RemoveAll(_commands.Contains);
+
+      _commands = null;
       Config = null;
+
       base.Dispose(disposing);
     }
   }
