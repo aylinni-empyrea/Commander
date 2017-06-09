@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TShockAPI;
+﻿using TShockAPI;
 
 namespace Commander
 {
@@ -11,6 +6,8 @@ namespace Commander
   {
     public string LastInfoMessage { get; private set; }
     public string LastErrorMessage { get; private set; }
+
+    public bool SuppressOutput { get; set; }
 
     public CommandExecutor(int index) : base(index)
     {
@@ -23,13 +20,17 @@ namespace Commander
     public override void SendInfoMessage(string msg)
     {
       LastInfoMessage = msg;
-      base.SendInfoMessage(msg);
+
+      if (!SuppressOutput)
+        base.SendInfoMessage(msg);
     }
 
     public override void SendErrorMessage(string msg)
     {
       LastErrorMessage = msg;
-      base.SendErrorMessage(msg);
+
+      if (!SuppressOutput)
+        base.SendErrorMessage(msg);
     }
   }
 }

@@ -45,6 +45,7 @@ namespace Commander
     Unspecified,
     NoPermission,
     Aborted,
-    Cooldown
+    Cooldown,
+    ServerNotAllowed
   }
 }

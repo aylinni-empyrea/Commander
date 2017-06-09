@@ -7,9 +7,10 @@ namespace Commander
 {
   public class CommandCollection
   {
-    private static readonly Dictionary<User, DateTime> _lastUsed = new Dictionary<User, DateTime>();
+    private readonly Dictionary<User, DateTime> _lastUsed = new Dictionary<User, DateTime>();
 
     public string[] Aliases { get; set; }
+    public bool Silent { get; set; }
 
     public bool AllowServer { get; set; }
     public string HelpSummary { get; set; }
@@ -17,7 +18,7 @@ namespace Commander
 
     public string UsagePermission { get; set; }
 
-    public double Cooldown { get; set; }
+    public uint Cooldown { get; set; }
 
     public CommandDefinition[] Commands { get; set; }
 
@@ -49,7 +50,7 @@ namespace Commander
 
     public void Execute(TSPlayer executor)
     {
-      if (_lastUsed.TryGetValue(executor.User, out DateTime lastUsed) &&
+      if (Cooldown != 0 && _lastUsed.TryGetValue(executor.User, out DateTime lastUsed) &&
           (DateTime.Now - lastUsed).TotalSeconds < Cooldown)
         throw new CommandException(CommandError.Cooldown, Cooldown - (DateTime.Now - lastUsed).TotalSeconds);
 
@@ -64,9 +65,13 @@ namespace Commander
       if (!executor.HasPermission(UsagePermission))
         throw new CommandException(CommandError.NoPermission);
 
-      _lastUsed[executor.User] = DateTime.Now;
+      if (Cooldown != 0)
+        _lastUsed[executor.User] = DateTime.Now;
 
       var target = new CommandExecutor(executor.Index);
+
+      if (Silent)
+        target.SuppressOutput = true;
 
       foreach (var cmd in Commands)
       {
