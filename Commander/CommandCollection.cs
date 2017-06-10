@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TShockAPI;
 using TShockAPI.DB;
 
@@ -22,10 +23,11 @@ namespace Commander
 
     public CommandDefinition[] Commands { get; set; }
 
-    public Command ToCommand()
+    public Command ToCommand(string name)
     {
+      var aliases = new[] { name }.Concat(Aliases).ToArray();
       var dlg = (CommandDelegate) Delegate.CreateDelegate(typeof(CommandDelegate), this, "Execute");
-      var cmd = new Command(dlg, Aliases) {AllowServer = AllowServer};
+      var cmd = new Command(dlg, aliases) {AllowServer = AllowServer};
 
       if (!string.IsNullOrEmpty(HelpSummary))
         cmd.HelpText = HelpSummary;

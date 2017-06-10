@@ -44,13 +44,13 @@ namespace Commander
 
         Config.Write(path);
       }
-      catch (JsonException ex)
+      catch (Exception ex) when (ex is JsonException || ex is ArgumentNullException)
       {
         TShock.Log.ConsoleError("Exception occurred while reading " + fileName + ", check logs for more details.");
         TShock.Log.ConsoleError(ex.Message);
 
         var oldPath = path;
-        var newPath = $"{oldPath}.{DateTime.Now:s}.bak";
+        var newPath = $"{oldPath}.{DateTime.Now:yyyyMMdd_HHmmss}.bak";
 
         File.Move(oldPath, newPath);
 
@@ -61,7 +61,7 @@ namespace Commander
         TShock.Log.Error(ex.ToString());
       }
 
-      _commands = Config.Commands.ToDictionary(k => k.Aliases[0], v => v.ToCommand());
+      _commands = Config.Definitions.ToDictionary(kv => kv.Key, kv => kv.Value.ToCommand(kv.Key));
 
       Commands.ChatCommands.RemoveAll(cmd => _commands.ContainsKey(cmd.Name));
       Commands.ChatCommands.AddRange(_commands.Values);

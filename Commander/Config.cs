@@ -7,24 +7,27 @@ namespace Commander
 {
   public class Config : JsonConfig
   {
-    public CommandCollection[] Commands { get; set; } =
+    public Dictionary<string, CommandCollection> Definitions { get; set; } = new Dictionary<string, CommandCollection>
     {
-      new CommandCollection
       {
-        Aliases = new[] {"sheal", "superheal"},
-        HelpSummary = "Heals a bit too good.",
-        HelpText = new[] {"Heals a bit too good.", "Maybe too much?"},
-        UsagePermission = "superheal",
-        AllowServer = false,
-        Cooldown = 5,
-        Commands = new[]
+        "superheal",
+        new CommandCollection
         {
-          new CommandDefinition("heal ${player}", true, false, false, true),
-          new CommandDefinition("bc ${player} got healed by some holy spirit!", true, false, false, true)
+          Aliases = new[] {"sheal"},
+          HelpSummary = "Heals a bit too good.",
+          HelpText = new[] {"Heals a bit too good.", "Maybe too much?"},
+          UsagePermission = "superheal",
+          AllowServer = false,
+          Cooldown = 5,
+          Commands = new[]
+          {
+            new CommandDefinition("heal ${player}", true, false, false, true),
+            new CommandDefinition("bc ${player} got healed by some holy spirit!", true, false, false, true)
+          }
         }
       }
     };
 
-    public IEnumerable<Command> GetCommands() => Commands.Select(collection => collection.ToCommand());
+    public IEnumerable<Command> GetCommands() => Definitions.Select(collection => collection.Value.ToCommand(collection.Key));
   }
 }
