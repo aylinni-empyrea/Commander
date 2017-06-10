@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Commander
 {
@@ -12,6 +8,7 @@ namespace Commander
     private const string NoPermissionError = "You don't have permission to use this command!";
     private const string AbortedError = "Command execution was stopped midway due to an error.";
     private const string CooldownError = "You must wait {0} seconds before you can use this command again.";
+    private const string NotEnoughParameters = "You must at least supply {0} arguments.";
 
     private static string GetErrorMessage(CommandError error)
     {
@@ -23,6 +20,8 @@ namespace Commander
           return AbortedError;
         case CommandError.Cooldown:
           return CooldownError;
+        case CommandError.NotEnoughParameters:
+          return NotEnoughParameters;
 
         case CommandError.Unspecified:
         default:
@@ -46,6 +45,6 @@ namespace Commander
     NoPermission,
     Aborted,
     Cooldown,
-    ServerNotAllowed
+    NotEnoughParameters
   }
 }

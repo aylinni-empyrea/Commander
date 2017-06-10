@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
+using TShockAPI.Hooks;
 
 namespace Commander
 {
@@ -25,24 +26,30 @@ namespace Commander
 
     public Plugin(Main game) : base(game)
     {
-      const string path = "Commander.json";
+    }
+
+    private void LoadConfig()
+    {
+      const string fileName = "Commander.json";
+      var path = Path.Combine(TShock.SavePath, fileName);
+
       try
       {
-        Config = JsonConfig.Read<Config>(Path.Combine(TShock.SavePath, path));
+        Config = JsonConfig.Read<Config>(path);
       }
       catch (FileNotFoundException)
       {
-        TShock.Log.ConsoleInfo(path + " not found, generating new one.");
+        TShock.Log.ConsoleInfo(fileName + " not found, generating new one.");
         Config = new Config();
 
         Config.Write(path);
       }
       catch (JsonException ex)
       {
-        TShock.Log.ConsoleError("Exception occurred while reading " + path + ", check logs for more details.");
+        TShock.Log.ConsoleError("Exception occurred while reading " + fileName + ", check logs for more details.");
         TShock.Log.ConsoleError(ex.Message);
 
-        var oldPath = Path.Combine(TShock.SavePath, path);
+        var oldPath = path;
         var newPath = $"{oldPath}.{DateTime.Now:s}.bak";
 
         File.Move(oldPath, newPath);
@@ -50,23 +57,31 @@ namespace Commander
         Config = new Config();
         Config.Write(path);
 
-        TShock.Log.ConsoleInfo(path + " has been backed up and a fresh one is generated.");
+        TShock.Log.ConsoleInfo(fileName + " has been backed up and a fresh one is generated.");
         TShock.Log.Error(ex.ToString());
       }
+
+      _commands = Config.Commands.ToDictionary(k => k.Aliases[0], v => v.ToCommand());
+
+      Commands.ChatCommands.RemoveAll(cmd => _commands.ContainsKey(cmd.Name));
+      Commands.ChatCommands.AddRange(_commands.Values);
     }
 
-    private static Command[] _commands;
+    private static Dictionary<string, Command> _commands;
 
     public override void Initialize()
     {
-      _commands = Config.GetCommands().ToArray();
-
-      Commands.ChatCommands.AddRange(_commands);
+      LoadConfig();
+      GeneralHooks.ReloadEvent += OnReload;
     }
+
+    private void OnReload(ReloadEventArgs e) => LoadConfig();
 
     protected override void Dispose(bool disposing)
     {
-      Commands.ChatCommands.RemoveAll(_commands.Contains);
+      GeneralHooks.ReloadEvent -= OnReload;
+
+      Commands.ChatCommands.RemoveAll(cmd => _commands.ContainsKey(cmd.Name));
 
       _commands = null;
       Config = null;

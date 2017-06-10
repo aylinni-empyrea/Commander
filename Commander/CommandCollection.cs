@@ -7,16 +7,16 @@ namespace Commander
 {
   public class CommandCollection
   {
-    private readonly Dictionary<User, DateTime> _lastUsed = new Dictionary<User, DateTime>();
+    private Dictionary<User, DateTime> _lastUsed;
 
     public string[] Aliases { get; set; }
-    public bool Silent { get; set; }
 
     public bool AllowServer { get; set; }
     public string HelpSummary { get; set; }
     public string[] HelpText { get; set; }
 
     public string UsagePermission { get; set; }
+    public int ExpectedParameterCount { get; set; }
 
     public uint Cooldown { get; set; }
 
@@ -40,7 +40,7 @@ namespace Commander
     {
       try
       {
-        Execute(args.Player);
+        Execute(args.Player, args.Parameters.ToArray());
       }
       catch (CommandException ex)
       {
@@ -48,34 +48,36 @@ namespace Commander
       }
     }
 
-    public void Execute(TSPlayer executor)
+    public void Execute(TSPlayer executor, params string[] args)
     {
-      if (Cooldown != 0 && _lastUsed.TryGetValue(executor.User, out DateTime lastUsed) &&
+      if (!executor.HasPermission(UsagePermission))
+        throw new CommandException(CommandError.NoPermission);
+
+      if (ExpectedParameterCount > args.Length)
+        throw new CommandException(CommandError.NotEnoughParameters, ExpectedParameterCount);
+
+      if (Cooldown != 0 && _lastUsed == null)
+        _lastUsed = new Dictionary<User, DateTime>();
+
+      if (executor.User != null && Cooldown != 0 &&
+          _lastUsed.TryGetValue(executor.User, out DateTime lastUsed) &&
           (DateTime.Now - lastUsed).TotalSeconds < Cooldown)
-        throw new CommandException(CommandError.Cooldown, Cooldown - (DateTime.Now - lastUsed).TotalSeconds);
+        throw new CommandException(CommandError.Cooldown,
+          Math.Round(Cooldown - (DateTime.Now - lastUsed).TotalSeconds));
 
       if (Commands.Length == 0)
         throw new InvalidOperationException("There are no commands defined in this collection.");
 
-      if (!executor.ConnectionAlive) return;
+      if (!AllowServer && !executor.ConnectionAlive) return;
 
-      if (executor.User == null)
-        throw new CommandException(CommandError.NoPermission);
-
-      if (!executor.HasPermission(UsagePermission))
-        throw new CommandException(CommandError.NoPermission);
-
-      if (Cooldown != 0)
+      if (executor.User != null && Cooldown != 0)
         _lastUsed[executor.User] = DateTime.Now;
 
-      var target = new CommandExecutor(executor.Index);
-
-      if (Silent)
-        target.SuppressOutput = true;
+      var target = executor.RealPlayer ? new CommandExecutor(executor.Index) : new CommandExecutorServer();
 
       foreach (var cmd in Commands)
       {
-        if (!cmd.TryExecute(target))
+        if (!cmd.TryExecute(target, args))
           throw new CommandException(CommandError.Unspecified);
 
         if (cmd.StopOnError && target.LastErrorMessage != null)
