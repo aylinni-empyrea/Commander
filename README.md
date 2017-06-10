@@ -3,7 +3,7 @@
 
 Designed as a standalone alternative to [CmdAlias](https://github.com/tylerjwatson/SEconomy/tree/master/CmdAliasPlugin).
 ## Installation
-Drop the plugin to your `ServerPlugins/` folder.
+Drop [the plugin](https://github.com/deadsurgeon42/Commander/releases) to your `ServerPlugins/` folder.
 After first run with the plugin installed, the configuration file
 `Commander.json` will be created.
 
