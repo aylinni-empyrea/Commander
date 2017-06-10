@@ -59,4 +59,4 @@ After first run with the plugin installed, the configuration file
 + `${wx}, ${wy}` = World coordinates of executor (coordinates × 16)
 + `${life}, ${lifeMax}, ${mana}, ${manaMax}` = Stats of executor
 
-**Need more variables?** [Make an issue!](issues/)
+**Need more variables?** [Make an issue!](https://github.com/deadsurgeon42/Commander/issues)
