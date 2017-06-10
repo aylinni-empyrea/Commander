@@ -10,7 +10,7 @@ After first run with the plugin installed, the configuration file
 ## Configuration
 
 ℹ️ **Reloading configuration file:** `/reload`
-```json
+```js
 {
     "Definitions": {                                     // holds commands
         "superheal": {                                   // command's primary name
