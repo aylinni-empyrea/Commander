@@ -1,4 +1,4 @@
-﻿# Commander [![Github Releases](https://img.shields.io/github/downloads/deadsurgeon42/Commander/latest/total.svg)](https://github.com/deadsurgeon42/Commander)
+﻿# Commander [![Github Releases](https://img.shields.io/github/downloads/deadsurgeon42/Commander/total.svg)](https://github.com/deadsurgeon42/Commander)
 🔗 *Meta-command system to create new commands by adding existing commands to each other + a few useful tweaks*
 
 Designed as a standalone alternative to [CmdAlias](https://github.com/tylerjwatson/SEconomy/tree/master/CmdAliasPlugin).
