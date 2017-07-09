@@ -1,16 +1,16 @@
-﻿# Commander [![Github Releases](https://img.shields.io/github/downloads/deadsurgeon42/Commander/latest/total.svg)](https://github.com/deadsurgeon42/Commander)
+﻿# Commander [![Github Releases](https://img.shields.io/github/downloads/deadsurgeon42/Commander/total.svg)](https://github.com/deadsurgeon42/Commander)
 🔗 *Meta-command system to create new commands by adding existing commands to each other + a few useful tweaks*
 
 Designed as a standalone alternative to [CmdAlias](https://github.com/tylerjwatson/SEconomy/tree/master/CmdAliasPlugin).
 ## Installation
-Drop the plugin to your `ServerPlugins/` folder.
+Drop [the plugin](https://github.com/deadsurgeon42/Commander/releases) to your `ServerPlugins/` folder.
 After first run with the plugin installed, the configuration file
 `Commander.json` will be created.
 
 ## Configuration
 
 ℹ️ **Reloading configuration file:** `/reload`
-```json
+```js
 {
     "Definitions": {                                     // holds commands
         "superheal": {                                   // command's primary name
@@ -59,4 +59,4 @@ After first run with the plugin installed, the configuration file
 + `${wx}, ${wy}` = World coordinates of executor (coordinates × 16)
 + `${life}, ${lifeMax}, ${mana}, ${manaMax}` = Stats of executor
 
-**Need more variables?** [Make an issue!](issues/)
+**Need more variables?** [Make an issue!](https://github.com/deadsurgeon42/Commander/issues)
