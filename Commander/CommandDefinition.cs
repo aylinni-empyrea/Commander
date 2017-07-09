@@ -29,7 +29,7 @@ namespace Commander
     private static readonly Dictionary<string, Func<CommandExecutor, string>> _argFuncs =
       new Dictionary<string, Func<CommandExecutor, string>>
       {
-        {"player", ex => ex.RealPlayer ? ex.Name : "Server"},
+        {"player", ex => "\"" + (ex.RealPlayer ? ex.Name : "Server") + "\""},
         {"user", ex => ex.User?.Name ?? ""},
         {"group", ex => ex.User?.Group ?? "Unregistered"},
         {"x", ex => ex.X.ToString(CultureInfo.InvariantCulture)},
