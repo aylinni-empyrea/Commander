@@ -9,10 +9,7 @@ namespace Commander
     public CommandExecutorServer() : base("Server")
     {
       Group = new SuperAdminGroup();
-      User = new User
-      {
-        Name = TSServerPlayer.AccountName
-      };
+      User = Server.User;
     }
 
     public override void SendMessage(string msg, Color color)
