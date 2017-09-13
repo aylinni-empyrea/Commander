@@ -11,41 +11,36 @@ After first run with the plugin installed, the configuration file
 
 ℹ️ **Reloading configuration file:** `/reload`
 ```js
-{
-    "Definitions": {                                     // holds commands
-        "superheal": {                                   // command's primary name
-            "Aliases": [ 
-                "sheal"                                  // won't show up on /help
-            ],
-            "AllowServer": false,                        // allow command to run from console?
-            "HelpSummary": "Heals a bit too good.",      // help summary
-            "HelpText": [ 
-                "Heals a bit too good.",                 // detailed help for
-                "Maybe too much?"                        // /help <command>
-            ],
-            "UsagePermission": "superheal",              // permission to use this command
-            "ExpectedParameterCount": 0,                 // how many parameters should be passed?
-            "Cooldown": 5,                               // how often can be the command used? (in seconds)
-            "Commands": [                                // array of commands to run in order
-                {
-                    "CommandTemplate": "heal ${player}", // template of command (see below)
-                    "RunAsSuperadmin": true,             // ignore tshock permission checks for above command
-                    "StopOnError": false,                // stop command chain when an error occurs
-                    "StopOnInfo": false,                 // stop command chain when an info message is sent
-                    "Silent": true                       // completely silence command output (to the executing player)
-                },
-                {
-                    "CommandTemplate": "bc ${player} got healed by some holy spirit!",
-                    "RunAsSuperadmin": true,
-                    "StopOnError": false,
-                    "StopOnInfo": false,
-                    "Silent": true
-                }
-            ]
-        }
-    }
-}
+[
+  {
+    "Aliases": [
+      "sheal" // first alias is the command name
+    ],
+    "AllowServer": false,
+    "HelpSummary": "Heals a bit too good.",
+    "HelpText": [
+      "Heals a bit too good.",
+      "Maybe too much?"
+    ],
+    "UsagePermission": "superheal",
+    "ExpectedParameterCount": 0,
+    "Cooldown": 5,
+    "Commands": [
+      "sudo silent /heal ${player}",
+      "sudo silent /bc ${player} got healed by some holy spirit!"
+    ]
+  }
+]
 ```
+
+## Modifiers
+
+⭐ *Command templates may include modifiers before the slash*
+
++ `sudo` = Ignore user's permissions when running the command
++ `silent` = Suppress command output *to the user*
++ `stoponerror` = Stop command chain when an __error__ message is received
++ `stoponinfo` = Stop command chain when an __info__ message is received
 
 ## Variables
 
