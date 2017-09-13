@@ -1,25 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using TShockAPI;
 
 namespace Commander
 {
+  [JsonConverter(typeof(CommandDefinitionConverter))]
   public class CommandDefinition
   {
-    public CommandDefinition(string commandTemplate, bool runAsSuperadmin, bool stopOnError, bool stopOnInfo,
-      bool silent)
+    public CommandDefinition(string commandTemplate, bool sudo, bool stopOnError, bool stopOnInfo, bool silent)
     {
       CommandTemplate = commandTemplate;
-      RunAsSuperadmin = runAsSuperadmin;
+      Sudo = sudo;
       StopOnError = stopOnError;
       StopOnInfo = stopOnInfo;
       Silent = silent;
     }
 
     public string CommandTemplate { get; }
-    public bool RunAsSuperadmin { get; }
+
+    public bool Sudo { get; }
     public bool StopOnError { get; }
     public bool StopOnInfo { get; }
     public bool Silent { get; }
@@ -73,10 +77,56 @@ namespace Commander
       var fullcmd = InsertArgs(CommandTemplate, executor, args)
         .Insert(0, Silent ? Commands.SilentSpecifier : Commands.Specifier);
 
-      if (RunAsSuperadmin)
+      if (Sudo)
         executor.Group = new SuperAdminGroup();
 
       return Commands.HandleCommand(executor, fullcmd);
+    }
+
+    public static CommandDefinition FromString(string composite)
+    {
+      string[] data = composite.Split('/');
+      string[] args = data[0].Split(' ');
+
+      var cmd = string.Join("", data.Skip(1));
+
+      if (string.IsNullOrEmpty(cmd))
+        throw new ArgumentException("Command cannot be empty.", nameof(composite));
+
+      return new CommandDefinition(cmd,
+        args.Contains("sudo"), args.Contains("stoponerror"), args.Contains("stoponinfo"), args.Contains("silent"));
+    }
+
+    public override string ToString()
+    {
+      var sb = new StringBuilder();
+
+      if (Sudo)
+        sb.Append("sudo ");
+
+      if (Silent)
+        sb.Append("silent ");
+
+      if (StopOnError)
+        sb.Append("stoponerror ");
+
+      if (StopOnInfo)
+        sb.Append("stoponinfo ");
+
+      sb.Append("/" + CommandTemplate);
+      return sb.ToString();
+    }
+
+    private class CommandDefinitionConverter : JsonConverter
+    {
+      public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        => writer.WriteValue(((CommandDefinition) value).ToString());
+
+      public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+        JsonSerializer serializer)
+        => FromString(reader.Value.ToString());
+
+      public override bool CanConvert(Type objectType) => typeof(CommandDefinition) == objectType;
     }
   }
 }

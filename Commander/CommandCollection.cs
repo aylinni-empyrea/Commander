@@ -23,17 +23,24 @@ namespace Commander
 
     public CommandDefinition[] Commands { get; set; }
 
+    public Command ToCommand() => ToCommand(Aliases[0]);
+
     public Command ToCommand(string name)
     {
-      var aliases = new[] { name }.Concat(Aliases).ToArray();
+      var aliases = new[] {name}.Concat(Aliases).ToArray();
       var dlg = (CommandDelegate) Delegate.CreateDelegate(typeof(CommandDelegate), this, "Execute");
-      var cmd = new Command(dlg, aliases) {AllowServer = AllowServer};
+
+      var cmd = string.IsNullOrEmpty(UsagePermission)
+        ? new Command(dlg, aliases)
+        : new Command(UsagePermission, dlg, aliases);
 
       if (!string.IsNullOrEmpty(HelpSummary))
         cmd.HelpText = HelpSummary;
 
       if (HelpText.Length != 0)
         cmd.HelpDesc = HelpText;
+
+      cmd.AllowServer = AllowServer;
 
       return cmd;
     }

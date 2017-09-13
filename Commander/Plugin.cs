@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ConfigStore;
 using Newtonsoft.Json;
 using Terraria;
 using TerrariaApi.Server;
@@ -22,52 +21,57 @@ namespace Commander
 
     public override Version Version => typeof(Plugin).Assembly.GetName().Version;
 
-    private Config Config;
+    private Dictionary<string, CommandCollection> _commands;
 
     public Plugin(Main game) : base(game)
     {
+      JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+      {
+        NullValueHandling = NullValueHandling.Ignore,
+        DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate
+      };
     }
 
     private void LoadConfig()
     {
       const string fileName = "Commander.json";
-      var path = Path.Combine(TShock.SavePath, fileName);
+      const string filePath = "tshock/" + fileName;
 
-      try
+      List<CommandCollection> data;
+
+      if (File.Exists(filePath))
       {
-        Config = JsonConfig.Read<Config>(path);
+        data = JsonConvert.DeserializeObject<List<CommandCollection>>(File.ReadAllText(filePath));
       }
-      catch (FileNotFoundException)
+      else
       {
         TShock.Log.ConsoleInfo(fileName + " not found, generating new one.");
-        Config = new Config();
+        data = new List<CommandCollection>
+        {
+          new CommandCollection
+          {
+            Aliases = new[] {"sheal"},
+            HelpSummary = "Heals a bit too good.",
+            HelpText = new[] {"Heals a bit too good.", "Maybe too much?"},
+            UsagePermission = "superheal",
+            AllowServer = false,
+            Cooldown = 5,
+            Commands = new[]
+            {
+              new CommandDefinition("heal ${player}", true, false, false, true),
+              new CommandDefinition("bc ${player} got healed by some holy spirit!", true, false, false, true)
+            }
+          }
+        };
 
-        Config.Write(path);
+        File.WriteAllText(filePath, JsonConvert.SerializeObject(data));
       }
-      catch (Exception ex) when (ex is JsonException || ex is ArgumentNullException)
-      {
-        TShock.Log.ConsoleError("Exception occurred while reading " + fileName + ", check logs for more details.");
-        TShock.Log.ConsoleError(ex.Message);
 
-        var oldPath = path;
-        var newPath = $"{oldPath}.{DateTime.Now:yyyyMMdd_HHmmss}.bak";
-
-        File.Move(oldPath, newPath);
-
-        Config = new Config();
-        Config.Write(path);
-
-        TShock.Log.ConsoleInfo(fileName + " has been backed up and a fresh one is generated.");
-        TShock.Log.Error(ex.ToString());
-      }
-
-      _commands = Config.Definitions.ToDictionary(kv => kv.Key, kv => kv.Value.ToCommand(kv.Key));
+      _commands = data.ToDictionary(k => k.Aliases[0]);
 
       Commands.ChatCommands.RemoveAll(cmd => _commands.ContainsKey(cmd.Name));
-      Commands.ChatCommands.AddRange(_commands.Values);
+      Commands.ChatCommands.AddRange(_commands.Values.Select(c => c.ToCommand()));
     }
-
-    private static Dictionary<string, Command> _commands;
 
     public override void Initialize()
     {
@@ -84,7 +88,6 @@ namespace Commander
       Commands.ChatCommands.RemoveAll(cmd => _commands.ContainsKey(cmd.Name));
 
       _commands = null;
-      Config = null;
 
       base.Dispose(disposing);
     }
