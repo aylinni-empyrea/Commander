@@ -37,7 +37,7 @@ namespace Commander
       if (!string.IsNullOrEmpty(HelpSummary))
         cmd.HelpText = HelpSummary;
 
-      if (HelpText.Length != 0)
+      if (HelpText != null && HelpText.Length > 0)
         cmd.HelpDesc = HelpText;
 
       cmd.AllowServer = AllowServer;

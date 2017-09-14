@@ -32,6 +32,7 @@ namespace Commander
       };
     }
 
+
     private void LoadConfig()
     {
       const string fileName = "Commander.json";
@@ -55,7 +56,6 @@ namespace Commander
             HelpText = new[] {"Heals a bit too good.", "Maybe too much?"},
             UsagePermission = "superheal",
             AllowServer = false,
-            Cooldown = 5,
             Commands = new[]
             {
               new CommandDefinition("heal ${player}", true, false, false, true),
