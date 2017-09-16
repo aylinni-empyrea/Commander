@@ -37,6 +37,7 @@ namespace Commander
     public CommandExecutor(int index) : base(index)
     {
       User = TShock.Players[index]?.User;
+      Group = TShock.Players[index]?.Group ?? Group.DefaultGroup;
     }
 
     protected CommandExecutor(string playerName) : base(playerName)

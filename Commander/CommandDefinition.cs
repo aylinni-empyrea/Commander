@@ -85,7 +85,9 @@ namespace Commander
 
     public static CommandDefinition FromString(string composite)
     {
-      string[] data = composite.Split('/');
+      var sep = composite.IndexOf('/');
+      var data = new[] {composite.Substring(0, sep), composite.Substring(sep + 1)};
+
       string[] args = data[0].Split(' ');
 
       var cmd = string.Join("", data.Skip(1));
