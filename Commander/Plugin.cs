@@ -58,8 +58,8 @@ namespace Commander
             AllowServer = false,
             Commands = new[]
             {
-              new CommandDefinition("heal ${player}", true, false, false, true),
-              new CommandDefinition("bc ${player} got healed by some holy spirit!", true, false, false, true)
+              new CommandDefinition("heal ${player}", true, false, false, true, true),
+              new CommandDefinition("bc ${player} got healed by some holy spirit!", true, false, false, true, true)
             }
           }
         };

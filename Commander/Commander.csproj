@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\Desktop\Tools\TShock\ServerPlugins\</OutputPath>
+    <OutputPath>..\..\..\..\Documents\Tools\TShock\ServerPlugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -49,21 +49,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\..\Desktop\Tools\TShock\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\..\Documents\Tools\TShock\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="OTAPI">
-      <HintPath>..\..\..\..\Desktop\Tools\TShock\OTAPI.dll</HintPath>
+      <HintPath>..\..\..\..\Documents\Tools\TShock\OTAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="TerrariaServer">
-      <HintPath>..\..\..\..\Desktop\Tools\TShock\TerrariaServer.exe</HintPath>
+      <HintPath>..\..\..\..\Documents\Tools\TShock\TerrariaServer.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="TShockAPI">
-      <HintPath>..\..\..\..\Desktop\Tools\TShock\ServerPlugins\TShockAPI.dll</HintPath>
+      <HintPath>..\..\..\..\Documents\Tools\TShock\ServerPlugins\TShockAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

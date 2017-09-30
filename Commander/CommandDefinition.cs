@@ -12,13 +12,15 @@ namespace Commander
   [JsonConverter(typeof(CommandDefinitionConverter))]
   public class CommandDefinition
   {
-    public CommandDefinition(string commandTemplate, bool sudo, bool stopOnError, bool stopOnInfo, bool silent)
+    public CommandDefinition(string commandTemplate, bool sudo, bool stopOnError, bool stopOnInfo, bool silent,
+      bool compatible)
     {
       CommandTemplate = commandTemplate;
       Sudo = sudo;
       StopOnError = stopOnError;
       StopOnInfo = stopOnInfo;
       Silent = silent;
+      Compatible = compatible;
     }
 
     public string CommandTemplate { get; }
@@ -27,6 +29,8 @@ namespace Commander
     public bool StopOnError { get; }
     public bool StopOnInfo { get; }
     public bool Silent { get; }
+
+    public bool Compatible { get; }
 
     private static readonly Regex _argRegex = new Regex(@"\$\{(\w+|@)\}", RegexOptions.Compiled);
 
@@ -69,24 +73,29 @@ namespace Commander
 
     public bool TryExecute(CommandExecutor executor, params string[] args)
     {
-      executor.SuppressOutput = Silent;
-
       if (CommandTemplate == null)
         throw new InvalidOperationException(nameof(CommandTemplate));
+
+      TSPlayer exc = executor;
+      
+      if (Compatible)
+        exc = TShock.Players[executor.Index];
 
       var fullcmd = InsertArgs(CommandTemplate, executor, args)
         .Insert(0, Silent ? Commands.SilentSpecifier : Commands.Specifier);
 
-      if (Sudo)
-        executor.Group = new SuperAdminGroup();
+      executor.SuppressOutput = Silent;
 
-      return Commands.HandleCommand(executor, fullcmd);
+      if (Sudo)
+        exc.Group = new SuperAdminGroup();
+
+      return Commands.HandleCommand(exc, fullcmd);
     }
 
     public static CommandDefinition FromString(string composite)
     {
       var sep = composite.IndexOf('/');
-      var data = new[] {composite.Substring(0, sep), composite.Substring(sep + 1)};
+      var data = new[] { composite.Substring(0, sep), composite.Substring(sep + 1) };
 
       string[] args = data[0].Split(' ');
 
@@ -96,7 +105,9 @@ namespace Commander
         throw new ArgumentException("Command cannot be empty.", nameof(composite));
 
       return new CommandDefinition(cmd,
-        args.Contains("sudo"), args.Contains("stoponerror"), args.Contains("stoponinfo"), args.Contains("silent"));
+        args.Contains("sudo"), args.Contains("stoponerror"),
+        args.Contains("stoponinfo"), args.Contains("silent"),
+        args.Contains("compatible"));
     }
 
     public override string ToString()
@@ -115,6 +126,9 @@ namespace Commander
       if (StopOnInfo)
         sb.Append("stoponinfo ");
 
+      if (Compatible)
+        sb.Append("compatible ");
+
       sb.Append("/" + CommandTemplate);
       return sb.ToString();
     }
@@ -122,7 +136,7 @@ namespace Commander
     private class CommandDefinitionConverter : JsonConverter
     {
       public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        => writer.WriteValue(((CommandDefinition) value).ToString());
+        => writer.WriteValue(((CommandDefinition)value).ToString());
 
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
         JsonSerializer serializer)

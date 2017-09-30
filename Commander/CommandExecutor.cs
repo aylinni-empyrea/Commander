@@ -36,8 +36,29 @@ namespace Commander
 
     public CommandExecutor(int index) : base(index)
     {
-      User = TShock.Players[index]?.User;
-      Group = TShock.Players[index]?.Group ?? Group.DefaultGroup;
+      var player = TShock.Players[index];
+
+      if (player == null)
+      {
+        TempPoints = new Point[2];
+        AwaitingName = false;
+        AwaitingNameParameters = null;
+        AwaitingTempPoint = 0;
+
+        User = null;
+        Group = Group.DefaultGroup;
+      }
+      else
+      {
+        TempPoints = player.TempPoints;
+        AwaitingName = player.AwaitingName;
+        AwaitingNameParameters = player.AwaitingNameParameters;
+        AwaitingTempPoint = player.AwaitingTempPoint;
+
+        User = player.User;
+        Group = player.Group;
+        tempGroup = player.tempGroup;
+      }
     }
 
     protected CommandExecutor(string playerName) : base(playerName)
