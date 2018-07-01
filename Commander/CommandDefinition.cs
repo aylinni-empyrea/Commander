@@ -77,7 +77,7 @@ namespace Commander
         throw new InvalidOperationException(nameof(CommandTemplate));
 
       TSPlayer exc = executor;
-      
+
       if (Compatible)
         exc = TShock.Players[executor.Index];
 
@@ -86,16 +86,23 @@ namespace Commander
 
       executor.SuppressOutput = Silent;
 
+      var oldGroup = exc.Group;
+
       if (Sudo)
         exc.Group = new SuperAdminGroup();
 
-      return Commands.HandleCommand(exc, fullcmd);
+      var result = Commands.HandleCommand(exc, fullcmd);
+
+      if (Sudo)
+        exc.Group = oldGroup;
+
+      return result;
     }
 
     public static CommandDefinition FromString(string composite)
     {
       var sep = composite.IndexOf('/');
-      var data = new[] { composite.Substring(0, sep), composite.Substring(sep + 1) };
+      var data = new[] {composite.Substring(0, sep), composite.Substring(sep + 1)};
 
       string[] args = data[0].Split(' ');
 
@@ -136,7 +143,7 @@ namespace Commander
     private class CommandDefinitionConverter : JsonConverter
     {
       public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        => writer.WriteValue(((CommandDefinition)value).ToString());
+        => writer.WriteValue(((CommandDefinition) value).ToString());
 
       public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
         JsonSerializer serializer)
